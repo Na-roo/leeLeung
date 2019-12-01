@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+   <import resource="datasource-config.xml"/>
+   <context:annotation-config/>
+   
+   <context:component-scan
+           base-package="com.itwill.board.boardReview"/>  
+   <context:component-scan
+           base-package="com.itwill.board.boardQna"/>  
+   <context:component-scan
+           base-package="com.itwill.board.boardNotice"/>  
+   <context:component-scan
+           base-package="com.itwill.cart"/>
+   <context:component-scan
+           base-package="com.itwill.jumun"/>
+   <context:component-scan
+           base-package="com.itwill.product"/>
+   <context:component-scan
+           base-package="com.itwill.member"/>
+           
+   <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+   		<property name="dataSource" ref="dataSource"/>
+   		<property name="mapperLocations">
+   			<list>
+   				<value>classpath:/com/itwill/board/boardReview/mapper/BoardReviewMapper.xml</value>
+   				<value>classpath:/com/itwill/board/boardQna/mapper/BoardQnaMapper.xml</value>
+   				<value>classpath:/com/itwill/board/boardNotice/mapper/BoardNoticeMapper.xml</value>
+   				<value>classpath:/com/itwill/cart/mapper/CartMapper.xml</value>
+   				<value>classpath:/com/itwill/jumun/mapper/JumunMapper.xml</value>
+   				<value>classpath:/com/itwill/jumun/mapper/JumunProductMapper.xml</value>
+   				<value>classpath:/com/itwill/product/mapper/ProductMapper.xml</value>
+   				<value>classpath:/com/itwill/member/mapper/MemberMapper.xml</value>
+   			</list>
+   		</property>
+   </bean>
+   
+   <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+   		<constructor-arg index="0" ref="sqlSessionFactory"/>
+   </bean>
+   
+   <!-- MultipartResolver 설정 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	  <property name="maxUploadSize" value="100000000" />
+	  <property name="maxInMemorySize" value="100000000" />
+	</bean>
+</beans>

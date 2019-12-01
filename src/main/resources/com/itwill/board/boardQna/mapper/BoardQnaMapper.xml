@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.board.mapper.BoardQnaMapper">
+
+	<!-- 게시물 리스트 보기 -->
+	<select id="boardQnaList" parameterType="HashMap"
+		resultType="com.itwill.board.boardQna.BoardQna">
+	<!-- 게시물 리스트 보기 (검색기능없는 sql)
+		SELECT * FROM (
+		SELECT rownum idx, s.* FROM
+		(
+		SELECT
+		qnano,qnawriter,qnatitle,qnadate,qnainquiry
+		FROM qna
+		ORDER BY qnano DESC
+		) s
+		)
+		WHERE idx >= #{startRowNum} AND idx &lt;= #{endRowNum}
+	-->
+		SELECT * FROM ( 
+        SELECT rownum idx, s.* FROM
+        (
+         SELECT
+         qnano,qnawriter,qnatitle,qnacontent,qnadate,qnainquiry
+         FROM (SELECT qnano,qnawriter,qnatitle,qnacontent,qnadate,qnainquiry
+         FROM qna
+         WHERE qnawriter like '%'||#{keyword}||'%' or qnatitle like '%'||#{keyword}||'%' or qnacontent like '%'||#{keyword}||'%'
+         ORDER BY qnano DESC
+         )
+         ) s
+		 )
+		 WHERE idx >= #{startRowNum} AND idx &lt;= #{endRowNum}
+	</select>
+	
+	<!-- 01_01. 게시글 리스트 조회 및 검색 조회까지 -->
+	<select id="listAll" resultType="com.itwill.board.boardQna.BoardQna" parameterType="HashMap">
+   		SELECT
+   		qnano,qnawriter,qnatitle,qnacontent,qnadate,qnainquiry
+    	FROM qna
+	    <!-- WHERE절을 include 태그로 삽입 -->
+	     <if test="searchOption=='all'">
+		  		WHERE qnawriter like '%'||#{keyword}||'%'
+	            OR qnacontent like '%'||#{keyword}||'%'
+	            OR qnatitle like '%'||#{keyword}||'%'
+	     </if> 
+	     <if test="searchOption!='all'">      
+	       		WHERE #{searchOption} like '%'||#{keyword}||'%'  
+	     </if>
+	    	ORDER BY qnano desc
+	</select>
+	
+	<!-- 01_02. 게시글 레코드 갯수 -->
+	<select id="countArticle" resultType="int">
+	    select count(*) from qna
+	    <!-- WHERE절을 include 태그로 삽입 -->
+	    <if test="searchOption=='all'">
+		  		WHERE qnawriter like '%'||#{keyword}||'%'
+	            OR qnacontent like '%'||#{keyword}||'%'
+	            OR qnatitle like '%'||#{keyword}||'%'
+	     </if> 
+	     <if test="searchOption!='all'">      
+	       		WHERE ${searchOption} like '%'||#{keyword}||'%'  
+	      </if> 
+	</select>
+	
+
+	<!-- 게시물 데이터수 알아내기 -->
+	<select id="boardQnaCount" resultType="int">
+		select count(*) from qna
+	</select>
+
+	<!-- 게시물 상세보기 (게시물번호로 찾기) -->
+	<select id="boardQnaSelectByQnaNo"
+		resultType="com.itwill.board.boardQna.BoardQna" parameterType="_int">
+		select *
+		from qna where qnano = #{qnaNo}
+	</select>
+
+	<!-- 게시물 작성하기 -->
+	<insert id="boardQnaInsert"
+		parameterType="com.itwill.board.boardQna.BoardQna">
+		<selectKey resultType="java.lang.Integer"
+			keyProperty="qnaNo" order="BEFORE">
+			SELECT qna_no_seq.nextval FROM DUAL
+		</selectKey>
+		insert into qna
+		values(#{qnaNo}, #{qnaWriter}, #{qnaTitle}, #{qnaContent}, sysdate, #{qnaInquiry})
+	</insert>
+
+	<!-- 게시물 수정하기 -->
+	<update id="boardQnaUpdate"
+		parameterType="com.itwill.board.boardQna.BoardQna">
+		update qna set
+		qnawriter=#{qnaWriter},qnatitle=#{qnaTitle},qnacontent=#{qnaContent}
+		where qnano=#{qnaNo}
+	</update>
+
+	<!-- 게시물 삭제하기 -->
+	<delete id="boardQnaDeleteByNo" parameterType="Integer">
+		delete from qna
+		where qnano = #{qnaNo}
+	</delete>
+
+	<!-- 문의게시물 조회수 증가 -->
+	<update id="boardQnaInquiryUpdate">
+		update qna set qnainquiry = qnainquiry + 1 where
+		qnano=#{qnaNo}
+	</update>
+
+</mapper>

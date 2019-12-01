@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.member.mapper.MemberMapper">
+	<select id="selectByAll" resultType="com.itwill.member.Member" parameterType="java.lang.String">
+		select * from member
+	</select>
+	
+	
+	<select id="selectByOne" resultType="com.itwill.member.Member" parameterType="java.lang.Integer">
+		select * from member where memberNo = #{memberNo}
+	</select>
+	
+	<select id="loginMember" resultType="com.itwill.member.Member" parameterType="com.itwill.member.Member">
+		select * from member where memberId = #{memberId} AND memberPassword = #{memberPassword, jdbcType=VARCHAR}
+	</select>
+	
+	
+	<insert id="insertMember" parameterType="com.itwill.member.Member">
+		<selectKey resultType="Integer" keyProperty="memberNo" order="BEFORE">
+			select member_no_seq.nextval from dual
+		</selectKey>
+		insert into member(memberNo, memberId, memberPassword, memberName, memberPhone, memberEmail, memberAddress, memberAddress2, postCode) values( #{memberNo}, #{memberId}, #{memberPassword}, #{memberName}, #{memberPhone}, #{memberEmail}, #{memberAddress}, #{memberAddress2}, #{postCode})
+	</insert>
+	
+	<update id="updateMember" parameterType="com.itwill.member.Member">
+		UPDATE member SET
+			memberPassword=#{memberPassword},
+			memberPhone=#{memberPhone},
+			memberEmail=#{memberEmail},
+			memberAddress=#{memberAddress}, 
+			memberAddress2=#{memberAddress2},
+			postCode=#{postCode}
+		WHERE 
+			memberNo=#{memberNo}
+	</update>
+	
+	<delete id="deleteMember" parameterType="java.lang.Integer">
+		delete from member where memberNo = #{memberNo}
+	</delete>
+	
+</mapper>
