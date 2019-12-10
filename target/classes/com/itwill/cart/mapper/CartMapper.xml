@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.cart.mapper.CartMapper">
+
+	<select id="selectCartList" resultType="com.itwill.cart.Cart" parameterType="java.lang.Integer">
+		select * from cart where memberNo=#{memberNo}
+	</select>
+	<select id="cartList" resultType="com.itwill.cart.Cart" parameterType="java.lang.Integer">
+		select c.cartno as cartno,c.memberno as memberno,c.cartqty as cartqty,p.productno as productno,p.productname as productname,
+		p.productprice as productprice,p.productimga as productimga from cart c,member m,product p 
+		where m.memberno = c.memberno and p.productno = c.productno and c.memberno = #{memberNo} order by c.cartno
+	</select>
+ <!-- 	<select id="existProduct" parameterType="com.itwill.cart.Cart" resultType="java.lang.Integer">
+		select count(*) from cart c 
+		join member m on c.memberNo = m.memberNo join product p on c.productNo=p.productNo 
+		where m.memberNo=#{memberNo} and c.productNo=#{productNo}
+	</select>
+ -->
+ 	<select id="existProduct" parameterType="map" resultType="java.lang.Integer">
+		select count(*) from cart 
+		where memberNo=#{memberNo} and productNo=#{productNo}
+	</select>
+	
+	<insert id="insertCart" parameterType="com.itwill.cart.Cart" >
+		
+		<selectKey resultType="Integer" keyProperty="cartNo" order="BEFORE">
+			select cart_no_seq.nextval from dual
+		</selectKey>
+		insert into cart values(#{cartNo}, #{cartQty}, #{memberNo}, #{productNo}, #{productOptionNo})
+	</insert>
+
+	<update id="updateCart" parameterType="com.itwill.cart.Cart">
+		update cart set cartQty=cartQty + #{cartQty} where memberNo=#{memberNo} and productNo=#{productNo}
+	</update>
+
+	<delete id="deleteCartList" parameterType="java.lang.Integer">
+		delete from cart where memberNo=#{memberNo}	
+	</delete>
+
+	<delete id="deleteCartOne" parameterType="com.itwill.cart.Cart">
+		delete from cart where cartNo=#{cartNo}
+	</delete>
+
+	
+	
+
+
+
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.product.mapper.ProductMapper">
+
+	<!-- 전체 찾기 -->
+	<select id="selectByAll" resultType="com.itwill.product.Product">
+		select * from product
+	</select>
+	
+	<!--   상품 등록 상품 번호로 1개 찾기 -->
+	<select id="selectByOne" resultType="com.itwill.product.Product"
+		parameterType="java.lang.Integer">
+		select * from product where productNo = #{productNo}
+	</select>
+	
+	<insert id="insertProduct"
+		parameterType="com.itwill.product.Product">
+
+		<selectKey resultType="Integer" keyProperty="productNo"
+			order="BEFORE">
+			select product_no_seq.nextval from dual
+		</selectKey>
+		insert into product values( #{productNo},
+		#{productName},#{productPrice},
+		#{productQty}, #{productImg}, #{productSalesQty},
+		#{categoryNo}, #{categoryDetailNo})
+	</insert>
+
+	
+
+	<!-- 상품 수정 -->
+	<update id="updateProduct"
+		parameterType="com.itwill.product.Product">
+		update product set
+		productName=#{productName},
+		productPrice=#{productPrice}, productQty=#{productQty},
+		productImg=#{productImg}, productSalesQty=#{productSalesQty},
+		categoryNo=#{categoryNo}, #{categoryDetailNo}
+		where
+		productNo=#{productNo}
+	</update>
+
+	<!--  상품 삭제 -->
+	<delete id="deleteProduct" parameterType="java.lang.Integer">
+		delete from product
+		where productNo=#{productNo}
+	</delete>
+
+	<!-- 카테고리 번호로 찾기(카테고리 별 분류)-->
+	<select id="selectByCategoryNo"
+		resultType="com.itwill.product.Product"
+		parameterType="java.lang.Integer">
+		select
+		*
+		from product p
+		inner join category c
+		on p.categoryNo=c.categoryNo
+		where p.categoryNo=#{categoryNo}
+	</select>
+	
+	<!-- <select id="">
+		select * from product where categoryNo=#{categoryNo}
+	</select> -->
+	
+	<!-- 카테고리 디테일 번호로 찾기(카테고리 상세 분류) -->
+	<select id="selectByCategoryDetailNo"
+		resultType="com.itwill.product.Product"
+		parameterType="java.lang.Integer">
+		select
+		*
+		from product p
+		inner join categoryDetail d
+		on p.categoryDetailNo=d.categoryDetailNo
+		where p.categoryDetailNo=#{categoryDetailNo}
+	</select>
+
+	<!-- 카테고리 별 판매량 순으로 정렬 -->
+	<select id="orderByProductSalesQty"
+		resultType="com.itwill.product.Product"
+		parameterType="java.lang.Integer">
+		select *
+		from product where categoryNo=#{categoryNo}
+		order by productSalesQty desc
+	</select>
+
+	<!-- 카테고리 별 저가순으로 정렬 -->
+	<select id="orderByPriceAsc"
+		resultType="com.itwill.product.Product"
+		parameterType="java.lang.Integer">
+<!-- 		 select productNo, productName, productPrice, productQty, productSalesQty
+		from product where categoryNo=#{categoryNo} 
+		order by productPrice asc  -->
+		
+		 select * from product where categoryNo=#{categoryNo} order by productPrice asc 
+		
+		
+	</select>
+
+
+	<!-- 카테고리 별 고가순으로 정렬 -->
+	<select id="orderByPriceDesc"
+		resultType="com.itwill.product.Product"
+		parameterType="java.lang.Integer">
+		select *
+		from product where categoryNo=#{categoryNo} 
+		order by productPrice desc
+	</select>
+
+
+
+
+
+</mapper>
